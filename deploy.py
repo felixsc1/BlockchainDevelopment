@@ -2,8 +2,8 @@ from solcx import compile_standard
 import json
 from web3 import Web3
 import os
-from dotenv import load_dotenv  # allows loading environment variables in .env file
 
+from dotenv import load_dotenv  # allows loading environment variables in .env file
 load_dotenv()
 
 with open("./test.sol", "r") as file:
@@ -42,12 +42,12 @@ bytecode = compiled_sol["contracts"]["test.sol"]["SimpleStorage"]["evm"]["byteco
 # get abi
 abi = compiled_sol["contracts"]["test.sol"]["SimpleStorage"]["abi"]
 
-# connect to ganache
-w3 = Web3(Web3.HTTPProvider("HTTP://127.0.0.1:8545"))
-chain_id = 1337
-my_address = "0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1"
+# connect to rinkeby
+w3 = Web3(Web3.HTTPProvider("https://rinkeby.infura.io/v3/4685edb7f6004c03a6a17893e9e605aa"))
+chain_id = 4
+my_address = "0xfDd914771a2BdF809FFEbc0E436c5b79BeDF059b"
 private_key = os.getenv("PRIVATE_KEY")  # note: may have to manually at 0x in front
-print(private_key)
+# print(private_key)
 
 simplestorage = w3.eth.contract(abi=abi, bytecode=bytecode)
 nonce = w3.eth.getTransactionCount(
@@ -78,7 +78,7 @@ simple_storage = w3.eth.contract(address=tx_receipt.contractAddress, abi=abi)
 # Transact -> Actually make a change (orange buttons in remix)
 # store and receive are functions we defined in the test.sol file
 # print(simple_storage.functions.store(15).call())
-print(simple_storage.functions.retrieve().call())  # 0 (default)
+# print(simple_storage.functions.retrieve().call())  # 0 (default)
 # still zero, because store(15) before was just a call
 # retrieve is a function in our test.sol contract, should print default value (0) if it works
 
@@ -93,4 +93,4 @@ signed_store_transaction = w3.eth.account.sign_transaction(
 )
 send_store_hash = w3.eth.send_raw_transaction(signed_store_transaction.rawTransaction)
 tx_receipt = w3.eth.wait_for_transaction_receipt(send_store_hash)
-print(simple_storage.functions.retrieve().call())  # now shows 15
+# print(simple_storage.functions.retrieve().call())  # now shows 15
